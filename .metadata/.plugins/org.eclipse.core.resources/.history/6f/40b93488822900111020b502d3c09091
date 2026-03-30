@@ -1,0 +1,33 @@
+server.port=8080
+
+spring.application.name=card-benefit-gateway-server
+
+# 회원 서비스
+spring.cloud.gateway.server.webmvc.routes[0].id=user-server
+spring.cloud.gateway.server.webmvc.routes[0].uri=http://localhost:8081
+spring.cloud.gateway.server.webmvc.routes[0].predicates[0]=Path=/api/users/**
+
+# 카드 서비스
+spring.cloud.gateway.server.webmvc.routes[1].id=card-server
+spring.cloud.gateway.server.webmvc.routes[1].uri=http://localhost:8082
+spring.cloud.gateway.server.webmvc.routes[1].predicates[0]=Path=/api/cards/**
+
+# 혜택 서비스
+spring.cloud.gateway.server.webmvc.routes[2].id=benefit-server
+spring.cloud.gateway.server.webmvc.routes[2].uri=http://localhost:8083
+spring.cloud.gateway.server.webmvc.routes[2].predicates[0]=Path=/api/benefits/**
+
+# 위치 서비스
+spring.cloud.gateway.server.webmvc.routes[3].id=location-server
+spring.cloud.gateway.server.webmvc.routes[3].uri=http://localhost:8084
+spring.cloud.gateway.server.webmvc.routes[3].predicates[0]=Path=/api/locations/**
+
+# 알림 서비스
+spring.cloud.gateway.server.webmvc.routes[4].id=notification-server
+spring.cloud.gateway.server.webmvc.routes[4].uri=http://localhost:8085
+spring.cloud.gateway.server.webmvc.routes[4].predicates[0]=Path=/api/notifications/**
+
+# 결제 서비스
+spring.cloud.gateway.server.webmvc.routes[5].id=payment-server
+spring.cloud.gateway.server.webmvc.routes[5].uri=http://localhost:8086
+spring.cloud.gateway.server.webmvc.routes[5].predicates[0]=Path=/api/payments/**

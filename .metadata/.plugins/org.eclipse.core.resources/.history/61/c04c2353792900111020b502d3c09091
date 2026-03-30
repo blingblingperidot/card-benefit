@@ -1,0 +1,6 @@
+package com.cardbenefit.benefit.test;
+@ResController
+@RequestMapping("/api/users")
+public class TestController {
+
+}

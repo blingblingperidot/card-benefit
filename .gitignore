@@ -1,0 +1,22 @@
+# Spring Boot
+**/target/
+**/.classpath
+**/.project
+**/.settings/
+**/bin/
+
+# React
+**/node_modules/
+**/.env
+
+# IDE
+**/.idea/
+**/*.iml
+**/.vscode/
+
+# Logs
+**/*.log
+
+# OS
+.DS_Store
+Thumbs.db
