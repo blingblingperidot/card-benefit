@@ -1,5 +1,0 @@
-package com.cardbenefit.gateway.config;
-
-public class GatewayConfig {
-
-}

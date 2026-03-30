@@ -1,5 +1,0 @@
-package com.cardbenefit.user.config;
-
-public class CorsConfig {
-
-}
