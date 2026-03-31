@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 
-function LoginPage() {
+function LoginPage({ setToken }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ userId: '', password: '' });
   const [error, setError] = useState('');
@@ -15,6 +15,7 @@ function LoginPage() {
     try {
       const response = await api.post('/api/users/login', form);
       localStorage.setItem('token', response.data.token);
+      setToken(response.data.token);
       navigate('/home');
     } catch (err) {
       setError('아이디 또는 비밀번호가 올바르지 않습니다.');
