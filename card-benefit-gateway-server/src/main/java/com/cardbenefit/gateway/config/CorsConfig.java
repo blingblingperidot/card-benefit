@@ -14,6 +14,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedOrigin("http://192.168.0.62:8081");
+        config.addAllowedOrigin("http://192.168.0.62:19000");  // 앱 Expo
+        config.addAllowedOrigin("http://192.168.0.62:8080");   // 앱 API
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
