@@ -36,4 +36,9 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> checkId(@RequestParam String userId) {
         return ResponseEntity.ok(userService.checkUserId(userId));
     }    
+ // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(userService.logout(token));
+    }   
 }

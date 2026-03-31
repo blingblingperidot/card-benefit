@@ -1,6 +1,7 @@
 package com.cardbenefit.user.service;
 
 import com.cardbenefit.user.config.JwtUtil;
+import com.cardbenefit.user.config.RedisUtil;
 import com.cardbenefit.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,8 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RedisUtil redisUtil;
 
     // 회원가입
     public Map<String, Object> signup(Map<String, Object> map) {
@@ -95,6 +98,10 @@ public class UserService {
         if (!jwtUtil.validateToken(jwt)) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
+        // 블랙리스트 확인 추가
+        if (redisUtil.isBlacklisted(jwt)) {
+            throw new RuntimeException("로그아웃된 토큰입니다.");
+        }        
 
         String userId = jwtUtil.getUserIdFromToken(jwt);
         Map<String, Object> user = userMapper.findById(userId);
@@ -103,6 +110,22 @@ public class UserService {
         result.put("userId", user.get("USER_ID"));
         result.put("email", user.get("EMAIL"));
         result.put("nickname", user.get("NICKNAME"));
+        return result;
+    }
+
+
+    // 로그아웃
+    public Map<String, Object> logout(String token) {
+        String jwt = token.replace("Bearer ", "");
+        
+        // 토큰 남은 만료시간 계산
+        long expiration = jwtUtil.getExpiration(jwt);
+        
+        // 블랙리스트에 추가
+        redisUtil.addBlacklist(jwt, expiration);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("message", "로그아웃 성공");
         return result;
     }
 }

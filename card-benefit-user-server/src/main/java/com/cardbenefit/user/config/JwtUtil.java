@@ -55,4 +55,16 @@ public class JwtUtil {
             return false;
         }
     }
+
+ // 토큰 남은 만료시간 반환 (밀리초)
+    public long getExpiration(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        long expiration = claims.getExpiration().getTime();
+        long now = System.currentTimeMillis();
+        return expiration - now;
+    }
 }
