@@ -13,7 +13,7 @@ function CardListPage() {
 
   const fetchCards = async () => {
     try {
-      const response = await api.get('/api/cards');
+      const response = await api.get('/api/cards/getcards');
       setCards(response.data);
     } catch (err) {
       setError('카드 목록 조회 실패');

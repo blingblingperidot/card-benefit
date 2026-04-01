@@ -16,7 +16,7 @@ public class CardController {
     private CardService cardService;
 
     // 내 카드 목록 조회
-    @GetMapping
+    @GetMapping("/getcards")
     public ResponseEntity<List<Map<String, Object>>> getCards(
             @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(cardService.getCards(token));
