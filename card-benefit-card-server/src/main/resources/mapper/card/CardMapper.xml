@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cardbenefit.card.mapper.CardMapper">
+
+    <!-- 카드 목록 조회 -->
+    <select id="findByUserId" parameterType="String" resultType="map">
+        SELECT card_id, user_id, card_name, card_type
+        FROM cards
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 카드 등록 -->
+    <insert id="insertCard" parameterType="map">
+        INSERT INTO cards (card_id, user_id, card_name, card_type)
+        VALUES ('CD' || LPAD(NVL((SELECT MAX(TO_NUMBER(SUBSTR(card_id, 3))) FROM cards), 0) + 1, 4, '0'), #{userId}, #{cardName}, #{cardType})
+    </insert>
+
+	<select id="findByCardIdAndUserId" resultType="map">
+	    SELECT card_id, user_id, card_name, card_type
+	    FROM cards
+	    WHERE card_id = #{cardId}
+	    AND user_id = #{userId}
+	</select>
+	 <!-- 카드 삭제 -->
+	<delete id="deleteCard" parameterType="String">
+	    DELETE FROM cards
+	    WHERE card_id = #{cardId}
+	</delete>
+
+</mapper>
