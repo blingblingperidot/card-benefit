@@ -3,13 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native
 import { useRouter } from 'expo-router';
 import api from '../../api/axios';
 
-export default function CardListScreen() {
+export default function AdminPageScreen() {
 
   // ==============================================================
   //                        변수 정의
   // ==============================================================
   const router = useRouter();
-  const [cards, setCards] = useState([]);
+  const [benefits, setBenefits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -19,10 +19,13 @@ export default function CardListScreen() {
     error: { color: 'red', marginBottom: 8, textAlign: 'center' },
     loading: { textAlign: 'center', color: '#666', marginTop: 40 },
     empty: { textAlign: 'center', color: '#666', marginTop: 40 },
-    card: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 16, marginBottom: 12 },
-    cardName: { fontWeight: 'bold', fontSize: 16 },
+    card: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 16, marginBottom: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    cardInfo: { flex: 1 },
+    benefitId: { color: '#999', fontSize: 12 },
+    storeName: { fontWeight: 'bold', fontSize: 16, marginTop: 4 },
     cardType: { color: '#666', marginTop: 4 },
-    deleteButton: { backgroundColor: '#E24B4A', padding: 8, borderRadius: 4 },
+    description: { color: '#999', fontSize: 12, marginTop: 4 },
+    deleteButton: { backgroundColor: '#E24B4A', padding: 8, borderRadius: 4, marginLeft: 8 },
     deleteButtonText: { color: '#fff' },
     button: { backgroundColor: '#4A90E2', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 16 },
     buttonText: { color: '#fff', fontWeight: 'bold' },
@@ -34,16 +37,16 @@ export default function CardListScreen() {
   //                        데이터 조회 처리
   // ==============================================================
   useEffect(() => {
-    fetchCards();
+    fetchBenefits();
   }, []);
 
-  const fetchCards = async () => {
+  const fetchBenefits = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/cards/getcards');
-      setCards(response.data);
+      const response = await api.get('/api/benefits/getAllBenefits');
+      setBenefits(response.data);
     } catch (err) {
-      setError('카드 목록 조회 실패');
+      setError('혜택 목록 조회 실패');
     } finally {
       setLoading(false);
     }
@@ -52,12 +55,12 @@ export default function CardListScreen() {
   // ==============================================================
   //                        이벤트 정의
   // ==============================================================
-  const handleDelete = async (cardId) => {
+  const handleDelete = async (benefitId) => {
     try {
-      await api.post('/api/cards/deletecards', { cardId });
-      fetchCards();
+      await api.post('/api/benefits/deletebenefit', { benefitId });
+      fetchBenefits();
     } catch (err) {
-      setError('카드 삭제 실패');
+      setError('혜택 삭제 실패');
     }
   };
 
@@ -66,25 +69,27 @@ export default function CardListScreen() {
   // ==============================================================
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>내 카드 목록</Text>
+      <Text style={styles.title}>관리자 페이지</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {loading ? (
         <Text style={styles.loading}>로딩 중...</Text>
-      ) : cards.length === 0 ? (
-        <Text style={styles.empty}>등록된 카드가 없습니다.</Text>
+      ) : benefits.length === 0 ? (
+        <Text style={styles.empty}>등록된 혜택이 없습니다.</Text>
       ) : (
         <FlatList
-          data={cards}
-          keyExtractor={(item) => item.CARD_ID}
+          data={benefits}
+          keyExtractor={(item) => item.BENEFIT_ID}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <View>
-                <Text style={styles.cardName}>{item.CARD_NAME}</Text>
+              <View style={styles.cardInfo}>
+                <Text style={styles.benefitId}>{item.BENEFIT_ID}</Text>
+                <Text style={styles.storeName}>{item.STORE_NAME}</Text>
                 <Text style={styles.cardType}>{item.CARD_TYPE}</Text>
+                <Text style={styles.description}>{item.DESCRIPTION}</Text>
               </View>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={() => handleDelete(item.CARD_ID)}>
+                onPress={() => handleDelete(item.BENEFIT_ID)}>
                 <Text style={styles.deleteButtonText}>삭제</Text>
               </TouchableOpacity>
             </View>
@@ -93,8 +98,8 @@ export default function CardListScreen() {
       )}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push('/(main)/cardregister')}>
-        <Text style={styles.buttonText}>카드 등록</Text>
+        onPress={() => router.push('/(main)/benefitregister')}>
+        <Text style={styles.buttonText}>혜택 등록</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.homeButton}

@@ -3,13 +3,19 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { useRouter } from 'expo-router';
 import api from '../../api/axios';
 
-export default function CardRegisterScreen() {
+export default function BenefitRegisterScreen() {
 
   // ==============================================================
   //                        변수 정의
   // ==============================================================
   const router = useRouter();
-  const [form, setForm] = useState({ cardName: '', cardType: '' });
+  const [form, setForm] = useState({
+    cardType: '',
+    storeName: '',
+    latitude: '',
+    longitude: '',
+    description: ''
+  });
   const [error, setError] = useState('');
 
   const styles = StyleSheet.create({
@@ -26,17 +32,17 @@ export default function CardRegisterScreen() {
   // ==============================================================
   //                        데이터 저장 처리
   // ==============================================================
-  const handleRegister = async () => {
-    if (!form.cardName || !form.cardType) {
-      setError('모든 항목을 입력해주세요.');
+  const handleInsert = async () => {
+    if (!form.cardType || !form.storeName || !form.latitude || !form.longitude) {
+      setError('필수 항목을 입력해주세요.');
       return;
     }
     try {
-      await api.post('/api/cards/insertcards', form);
-      Alert.alert('카드 등록 성공!');
-      router.replace('/(main)/cardlist');
+      await api.post('/api/benefits/insertbenefit', form);
+      Alert.alert('혜택 등록 성공!');
+      router.replace('/(main)/adminpage');
     } catch (err) {
-      setError('카드 등록 실패');
+      setError('혜택 등록 실패');
     }
   };
 
@@ -44,8 +50,11 @@ export default function CardRegisterScreen() {
   //                        필드 정의
   // ==============================================================
   const fields = [
-    { key: 'cardName', placeholder: '카드명 (예: 삼성ID_ON카드)' },
-    { key: 'cardType', placeholder: '카드 종류 (예: SAMSUNG_ID_ON)' },
+    { key: 'cardType', placeholder: '카드 종류 (예: SAMSUNG_ID_ON)', required: true },
+    { key: 'storeName', placeholder: '매장명', required: true },
+    { key: 'latitude', placeholder: '위도', required: true },
+    { key: 'longitude', placeholder: '경도', required: true },
+    { key: 'description', placeholder: '설명', required: false },
   ];
 
   // ==============================================================
@@ -53,23 +62,23 @@ export default function CardRegisterScreen() {
   // ==============================================================
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>카드 등록</Text>
+      <Text style={styles.title}>혜택 등록</Text>
       {fields.map((field) => (
         <TextInput
           key={field.key}
           style={styles.input}
-          placeholder={field.placeholder}
+          placeholder={field.placeholder + (field.required ? ' *' : '')}
           value={form[field.key]}
           onChangeText={(text) => setForm({ ...form, [field.key]: text })}
         />
       ))}
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+      <TouchableOpacity style={styles.button} onPress={handleInsert}>
         <Text style={styles.buttonText}>등록</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.cancelButton}
-        onPress={() => router.replace('/(main)/cardlist')}>
+        onPress={() => router.replace('/(main)/adminpage')}>
         <Text style={styles.cancelButtonText}>취소</Text>
       </TouchableOpacity>
     </View>

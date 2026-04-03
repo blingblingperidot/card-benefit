@@ -1,19 +1,35 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { useRouter } from 'expo-router';
+import api from '../../api/axios';
 
-function AdminPage() {
+export default function AdminPageScreen() {
 
   // ==============================================================
   //                        변수 정의
   // ==============================================================
-  const navigate = useNavigate();
+  const router = useRouter();
   const [benefits, setBenefits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const thStyle = { padding: '12px', textAlign: 'left', borderBottom: '2px solid #ddd', fontWeight: 'bold' };
-  const tdStyle = { padding: '12px', textAlign: 'left' };
+  const styles = StyleSheet.create({
+    container: { flex: 1, padding: 20, paddingTop: 60 },
+    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+    error: { color: 'red', marginBottom: 8, textAlign: 'center' },
+    loading: { textAlign: 'center', color: '#666', marginTop: 40 },
+    empty: { textAlign: 'center', color: '#666', marginTop: 40 },
+    headerRow: { flexDirection: 'row', backgroundColor: '#f5f5f5', paddingVertical: 10, borderBottomWidth: 2, borderBottomColor: '#ddd', borderTopWidth: 1, borderTopColor: '#ddd' },
+    headerCell: { fontWeight: 'bold', fontSize: 11, paddingHorizontal: 4, textAlign: 'center' },
+    row: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#eee', alignItems: 'center' },
+    cell: { fontSize: 11, paddingHorizontal: 4, textAlign: 'center' },
+    deleteButton: { backgroundColor: '#E24B4A', padding: 6, borderRadius: 4, alignItems: 'center' },
+    deleteButtonText: { color: '#fff', fontSize: 11 },
+    button: { backgroundColor: '#4A90E2', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 16 },
+    buttonText: { color: '#fff', fontWeight: 'bold' },
+    homeButton: { padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 8 },
+    homeButtonText: { color: '#4A90E2' }
+  });
 
   // ==============================================================
   //                        데이터 조회 처리
@@ -50,73 +66,64 @@ function AdminPage() {
   //                        그리드 컬럼 정의
   // ==============================================================
   const columns = [
-    { key: 'BENEFIT_ID', label: '혜택ID' },
-    { key: 'CARD_TYPE', label: '카드종류' },
-    { key: 'STORE_NAME', label: '매장명' },
-    { key: 'DESCRIPTION', label: '설명' },
-    { key: 'LATITUDE', label: '위도' },
-    { key: 'LONGITUDE', label: '경도' },
+    { key: 'BENEFIT_ID', label: '혜택ID', flex: 1.2 },
+    { key: 'CARD_TYPE', label: '카드종류', flex: 1.2 },
+    { key: 'STORE_NAME', label: '매장명', flex: 1.2 },
+    { key: 'DESCRIPTION', label: '설명', flex: 2 },
   ];
 
   // ==============================================================
   //                          화면 구성
   // ==============================================================
   return (
-    <div style={{ padding: '40px' }}>
-      <h2>관리자 페이지</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f5f5f5' }}>
-            {columns.map((col) => (
-              <th key={col.key} style={thStyle}>{col.label}</th>
-            ))}
-            <th style={thStyle}>삭제</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '20px' }}>로딩 중...</td>
-            </tr>
-          ) : benefits.length === 0 ? (
-            <tr>
-              <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                등록된 혜택이 없습니다.
-              </td>
-            </tr>
-          ) : (
-            benefits.map((benefit) => (
-              <tr key={benefit.BENEFIT_ID} style={{ borderBottom: '1px solid #eee' }}>
-                {columns.map((col) => (
-                  <td key={col.key} style={tdStyle}>{benefit[col.key]}</td>
-                ))}
-                <td style={tdStyle}>
-                  <button
-                    onClick={() => handleDelete(benefit.BENEFIT_ID)}
-                    style={{ backgroundColor: '#E24B4A', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 12px', cursor: 'pointer' }}>
-                    삭제
-                  </button>
-                </td>
-              </tr>
-            ))
+    <View style={styles.container}>
+      <Text style={styles.title}>관리자 페이지</Text>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      {/* 헤더 */}
+      <View style={styles.headerRow}>
+        {columns.map((col) => (
+          <Text key={col.key} style={[styles.headerCell, { flex: col.flex }]}>{col.label}</Text>
+        ))}
+        <Text style={[styles.headerCell, { flex: 0.8 }]}>삭제</Text>
+      </View>
+
+      {/* 바디 */}
+      {loading ? (
+        <Text style={styles.loading}>로딩 중...</Text>
+      ) : benefits.length === 0 ? (
+        <Text style={styles.empty}>등록된 혜택이 없습니다.</Text>
+      ) : (
+        <FlatList
+          data={benefits}
+          keyExtractor={(item) => item.BENEFIT_ID}
+          renderItem={({ item }) => (
+            <View style={styles.row}>
+              {columns.map((col) => (
+                <Text key={col.key} style={[styles.cell, { flex: col.flex }]} numberOfLines={1}>{item[col.key]}</Text>
+              ))}
+              <View style={{ flex: 0.8, alignItems: 'center' }}>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleDelete(item.BENEFIT_ID)}>
+                  <Text style={styles.deleteButtonText}>삭제</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           )}
-        </tbody>
-      </table>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button
-          onClick={() => navigate('/admin/benefit/register')}
-          style={{ padding: '10px 24px', backgroundColor: '#4A90E2', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-          혜택 등록
-        </button>
-        <button
-          onClick={() => navigate('/home')}
-          style={{ padding: '10px 24px', cursor: 'pointer', border: '1px solid #ccc', borderRadius: '8px' }}>
-          홈으로
-        </button>
-      </div>
-    </div>
+        />
+      )}
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.push('/(main)/benefitregister')}>
+        <Text style={styles.buttonText}>혜택 등록</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.homeButton}
+        onPress={() => router.replace('/(main)/home')}>
+        <Text style={styles.homeButtonText}>홈으로</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
-
-export default AdminPage;
