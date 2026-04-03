@@ -3,23 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 
 function CardListPage() {
+
+  // ==============================================================
+  //                        변수 정의
+  // ==============================================================
   const navigate = useNavigate();
   const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // ==============================================================
+  //                        데이터 조회 처리
+  // ==============================================================
   useEffect(() => {
     fetchCards();
   }, []);
 
   const fetchCards = async () => {
     try {
+      setLoading(true);
       const response = await api.get('/api/cards/getcards');
       setCards(response.data);
     } catch (err) {
       setError('카드 목록 조회 실패');
+    } finally {
+      setLoading(false);
     }
   };
 
+  // ==============================================================
+  //                        이벤트 정의
+  // ==============================================================
   const handleDelete = async (cardId) => {
     try {
       await api.post('/api/cards/deletecards', { cardId });
@@ -29,11 +43,16 @@ function CardListPage() {
     }
   };
 
+  // ==============================================================
+  //                          화면 구성
+  // ==============================================================
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>
       <h2>내 카드 목록</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {cards.length === 0 ? (
+      {loading ? (
+        <p>로딩 중...</p>
+      ) : cards.length === 0 ? (
         <p>등록된 카드가 없습니다.</p>
       ) : (
         cards.map((card) => (
