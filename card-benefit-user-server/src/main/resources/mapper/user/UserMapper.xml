@@ -19,10 +19,10 @@
     </select>
    
 	<select id="findById" parameterType="String" resultType="map">
-	    SELECT user_id, email, password, nickname, created_at
+	    SELECT user_id, email, password, nickname, usr_tp_cd, created_at
 	    FROM users
 	    WHERE user_id = #{userId}
-	</select>	
+	</select>
 	
 	<!-- 아이디 중복 확인 -->
 	<select id="checkUserId" parameterType="String" resultType="map">

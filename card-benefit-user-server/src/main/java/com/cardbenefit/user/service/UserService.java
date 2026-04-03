@@ -21,24 +21,22 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private RedisUtil redisUtil;
 
     // 회원가입
     public Map<String, Object> signup(Map<String, Object> map) {
-        // 아이디 중복 체크
         Map<String, Object> existUser = userMapper.findById((String) map.get("userId"));
         if (existUser != null) {
             throw new RuntimeException("이미 존재하는 아이디입니다.");
         }
 
-        // 이메일 중복 체크
         Map<String, Object> existEmail = userMapper.findByEmail((String) map.get("email"));
         if (existEmail != null) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
 
-        // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode((String) map.get("password"));
         map.put("password", encodedPassword);
 
@@ -73,21 +71,18 @@ public class UserService {
             throw new RuntimeException("존재하지 않는 아이디입니다.");
         }
 
-        // 임시 로그
-        System.out.println("user map keys: " + user.keySet());
-        System.out.println("password value: " + user.get("PASSWORD"));
-        System.out.println("password value lower: " + user.get("password"));
-
         if (!passwordEncoder.matches(password, (String) user.get("PASSWORD"))) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtUtil.generateToken(userId);
+        String usrTpCd = (String) user.get("USR_TP_CD");
+        String token = jwtUtil.generateToken(userId, usrTpCd);
 
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
         result.put("userId", userId);
         result.put("nickname", user.get("NICKNAME"));
+        result.put("usrTpCd", usrTpCd);
         return result;
     }
 
@@ -98,10 +93,10 @@ public class UserService {
         if (!jwtUtil.validateToken(jwt)) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
-        // 블랙리스트 확인 추가
+
         if (redisUtil.isBlacklisted(jwt)) {
             throw new RuntimeException("로그아웃된 토큰입니다.");
-        }        
+        }
 
         String userId = jwtUtil.getUserIdFromToken(jwt);
         Map<String, Object> user = userMapper.findById(userId);
@@ -110,20 +105,16 @@ public class UserService {
         result.put("userId", user.get("USER_ID"));
         result.put("email", user.get("EMAIL"));
         result.put("nickname", user.get("NICKNAME"));
+        result.put("usrTpCd", user.get("USR_TP_CD"));
         return result;
     }
-
 
     // 로그아웃
     public Map<String, Object> logout(String token) {
         String jwt = token.replace("Bearer ", "");
-        
-        // 토큰 남은 만료시간 계산
         long expiration = jwtUtil.getExpiration(jwt);
-        
-        // 블랙리스트에 추가
         redisUtil.addBlacklist(jwt, expiration);
-        
+
         Map<String, Object> result = new HashMap<>();
         result.put("message", "로그아웃 성공");
         return result;
