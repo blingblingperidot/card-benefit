@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cardbenefit.location.mapper.LocationMapper">
+
+    <!-- 전체 혜택 목록 조회 (위도/경도 포함) -->
+    <select id="getAllBenefits" resultType="map">
+        SELECT benefit_id, card_type, store_name, latitude, longitude, description
+        FROM benefits
+    </select>
+
+</mapper>
