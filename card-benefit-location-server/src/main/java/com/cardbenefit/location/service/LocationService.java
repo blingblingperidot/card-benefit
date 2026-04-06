@@ -2,6 +2,7 @@ package com.cardbenefit.location.service;
 
 import com.cardbenefit.location.config.JwtUtil;
 import com.cardbenefit.location.config.LocationProducer;
+import com.cardbenefit.location.config.RedisUtil;
 import com.cardbenefit.location.mapper.LocationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class LocationService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     // 위치 업데이트 및 근처 매장 탐지
     public Map<String, Object> updateLocation(String token, Map<String, Object> map) {
@@ -43,13 +47,23 @@ public class LocationService {
             double distance = calculateDistance(userLat, userLon, storeLat, storeLon);
 
             if (distance <= 200) {
+                String benefitId = benefit.get("BENEFIT_ID").toString();
+
+                // 중복 체크 - 이미 알림 발송했으면 스킵
+                if (redisUtil.isAlreadyNotified(userId, benefitId)) {
+                    continue;
+                }
+
                 String message = "{"
                         + "\"userId\":\"" + userId + "\","
-                        + "\"benefitId\":\"" + benefit.get("BENEFIT_ID") + "\","
+                        + "\"benefitId\":\"" + benefitId + "\","
                         + "\"storeName\":\"" + benefit.get("STORE_NAME") + "\","
                         + "\"distance\":" + distance
                         + "}";
                 locationProducer.sendLocationEvent(message);
+
+                // 알림 발송 기록 저장
+                redisUtil.saveNotified(userId, benefitId);
             }
         }
 
