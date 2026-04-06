@@ -20,6 +20,7 @@ export default function CardListScreen() {
     loading: { textAlign: 'center', color: '#666', marginTop: 40 },
     empty: { textAlign: 'center', color: '#666', marginTop: 40 },
     card: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 16, marginBottom: 12 },
+    cardInfo: { flex: 1 },
     cardName: { fontWeight: 'bold', fontSize: 16 },
     cardType: { color: '#666', marginTop: 4 },
     deleteButton: { backgroundColor: '#E24B4A', padding: 8, borderRadius: 4 },
@@ -61,6 +62,10 @@ export default function CardListScreen() {
     }
   };
 
+  const handleBenefitList = (cardType, cardName) => {
+    router.push({ pathname: '/(main)/benefitlist', params: { cardType, cardName } });
+  };
+
   // ==============================================================
   //                          화면 구성
   // ==============================================================
@@ -78,10 +83,12 @@ export default function CardListScreen() {
           keyExtractor={(item) => item.CARD_ID}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <View>
+              <TouchableOpacity
+                style={styles.cardInfo}
+                onPress={() => handleBenefitList(item.CARD_TYPE, item.CARD_NAME)}>
                 <Text style={styles.cardName}>{item.CARD_NAME}</Text>
                 <Text style={styles.cardType}>{item.CARD_TYPE}</Text>
-              </View>
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => handleDelete(item.CARD_ID)}>
