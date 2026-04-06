@@ -52,9 +52,6 @@ function BenefitListPage() {
           }}>
             <p style={{ fontWeight: 'bold' }}>{benefit.STORE_NAME}</p>
             <p style={{ color: '#666' }}>{benefit.DESCRIPTION}</p>
-            <p style={{ color: '#999', fontSize: '12px' }}>
-              위도: {benefit.LATITUDE} / 경도: {benefit.LONGITUDE}
-            </p>
           </div>
         ))
       )}
