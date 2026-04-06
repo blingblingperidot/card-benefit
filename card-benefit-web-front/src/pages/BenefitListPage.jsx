@@ -9,7 +9,7 @@ function BenefitListPage() {
   // ==============================================================
   const navigate = useNavigate();
   const location = useLocation();
-  const { cardName } = location.state || {};
+  const { cardType, cardName } = location.state || {};
   const [benefits, setBenefits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,8 +24,7 @@ function BenefitListPage() {
   const fetchBenefits = async () => {
     try {
       setLoading(true);
-      const userId = localStorage.getItem('userId');
-      const response = await api.get(`/api/benefits/getCardBenefit?userId=${userId}`);
+      const response = await api.get(`/api/benefits/getCardBenefit?cardType=${cardType}`);
       setBenefits(response.data);
     } catch (err) {
       setError('혜택 목록 조회 실패');

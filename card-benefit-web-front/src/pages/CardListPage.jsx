@@ -43,6 +43,10 @@ function CardListPage() {
     }
   };
 
+  const handleBenefitList = (cardType, cardName) => {
+    navigate('/benefit/list', { state: { cardType, cardName } });
+  };
+
   // ==============================================================
   //                          화면 구성
   // ==============================================================
@@ -60,7 +64,9 @@ function CardListPage() {
             width: '300px', border: '1px solid #ccc', borderRadius: '8px',
             padding: '16px', margin: '8px', display: 'flex', justifyContent: 'space-between'
           }}>
-            <div>
+            <div
+              style={{ cursor: 'pointer', flex: 1 }}
+              onClick={() => handleBenefitList(card.CARD_TYPE, card.CARD_NAME)}>
               <p style={{ fontWeight: 'bold' }}>{card.CARD_NAME}</p>
               <p style={{ color: '#666' }}>{card.CARD_TYPE}</p>
             </div>
