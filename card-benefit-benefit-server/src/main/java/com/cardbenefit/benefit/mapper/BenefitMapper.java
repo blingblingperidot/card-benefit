@@ -7,7 +7,7 @@ import java.util.Map;
 @Mapper
 public interface BenefitMapper {
 
-    List<Map<String, Object>> getCardBenefit(String userId);
+	List<Map<String, Object>> getCardBenefit(String cardType);
 
     void insertBenefit(Map<String, Object> map);
 

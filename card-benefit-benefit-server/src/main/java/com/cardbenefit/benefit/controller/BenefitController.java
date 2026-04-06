@@ -18,8 +18,8 @@ public class BenefitController {
     // 혜택 조회 (cards INNER JOIN benefits)
     @GetMapping("/getCardBenefit")
     public ResponseEntity<List<Map<String, Object>>> getCardBenefit(
-            @RequestParam String userId) {
-        return ResponseEntity.ok(benefitService.getCardBenefit(userId));
+            @RequestParam String cardType) {
+        return ResponseEntity.ok(benefitService.getCardBenefit(cardType));
     }
 
  // 혜택 데이터 등록 (관리자용)

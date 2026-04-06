@@ -18,9 +18,9 @@ public class BenefitService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // 혜택 조회 (누구나 가능)
-    public List<Map<String, Object>> getCardBenefit(String userId) {
-        return benefitMapper.getCardBenefit(userId);
+ // 혜택 조회 (누구나 가능)
+    public List<Map<String, Object>> getCardBenefit(String cardType) {
+        return benefitMapper.getCardBenefit(cardType);
     }
 
     // 혜택 등록 (ADMIN만 가능)

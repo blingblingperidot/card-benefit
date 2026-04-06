@@ -4,14 +4,13 @@
 
 <mapper namespace="com.cardbenefit.benefit.mapper.BenefitMapper">
 
-    <!--사용자가 혜택 조회  -->
-    <select id="getCardBenefit" parameterType="String" resultType="map">
-        SELECT c.card_id, c.card_name, c.card_type,
-               b.benefit_id, b.store_name, b.latitude, b.longitude, b.description
-        FROM cards c
-        INNER JOIN benefits b ON c.card_type = b.card_type
-        WHERE c.user_id = #{userId}
-    </select>
+	
+	<!-- 혜택 조회 -->
+	<select id="getCardBenefit" parameterType="String" resultType="map">
+	    SELECT benefit_id, card_type, store_name, latitude, longitude, description
+	    FROM benefits
+	    WHERE card_type = #{cardType}
+	</select>
 
 	<!-- 전체 혜택 목록 조회 (관리자용) -->
 	<select id="getAllBenefits" resultType="map">
