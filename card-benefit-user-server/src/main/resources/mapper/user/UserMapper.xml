@@ -29,6 +29,13 @@
 	    SELECT user_id
 	    FROM users
 	    WHERE user_id = #{userId}
-	</select>    
+	</select> 
+	
+<!-- FCM 토큰 업데이트 -->
+<update id="updateFcmToken" parameterType="map">
+    UPDATE users
+    SET fcm_token = #{fcmToken}
+    WHERE user_id = #{userId}
+</update>	   
 
 </mapper>

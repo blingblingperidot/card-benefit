@@ -119,4 +119,14 @@ public class UserService {
         result.put("message", "로그아웃 성공");
         return result;
     }
+ // FCM 토큰 저장
+    public Map<String, Object> saveFcmToken(String token, Map<String, Object> map) {
+        String jwt = token.replace("Bearer ", "");
+        String userId = jwtUtil.getUserIdFromToken(jwt);
+        map.put("userId", userId);
+        userMapper.updateFcmToken(map);
+        Map<String, Object> result = new HashMap<>();
+        result.put("message", "FCM 토큰 저장 성공");
+        return result;
+    }    
 }

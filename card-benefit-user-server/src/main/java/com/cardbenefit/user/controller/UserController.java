@@ -41,4 +41,11 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> logout(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(userService.logout(token));
     }   
+ // FCM 토큰 저장
+    @PostMapping("/fcm-token")
+    public ResponseEntity<Map<String, Object>> saveFcmToken(
+            @RequestHeader("Authorization") String token,
+            @RequestBody Map<String, Object> map) {
+        return ResponseEntity.ok(userService.saveFcmToken(token, map));
+    }    
 }

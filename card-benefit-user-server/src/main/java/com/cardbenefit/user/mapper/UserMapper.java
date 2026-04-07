@@ -15,4 +15,5 @@ public interface UserMapper {
     
     // 아이디 중복확인
     Map<String, Object> checkUserId(String userId);
+    void updateFcmToken(Map<String, Object> map);
 }

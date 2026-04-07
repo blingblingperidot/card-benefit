@@ -20,7 +20,7 @@ public class SecurityConfig {
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/signup", "/api/users/login","/api/users/profile", "/api/users/check-id","/api/users/logout").permitAll()
+                .requestMatchers("/api/users/signup", "/api/users/login","/api/users/profile", "/api/users/check-id","/api/users/logout", "/api/users/fcm-token").permitAll()
                 .anyRequest().authenticated()
             );
         return http.build();
