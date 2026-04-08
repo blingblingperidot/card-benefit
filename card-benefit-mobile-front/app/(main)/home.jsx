@@ -54,22 +54,31 @@ export default function HomeScreen() {
     };
     init();
 
+    // 알림 수신 리스너
+    const notificationListener = Notifications.addNotificationReceivedListener(notification => {
+      console.log('알림 수신:', notification);
+    });
+
+    const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('알림 클릭:', response);
+    });
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      notificationListener.remove();
+      responseListener.remove();
     };
   }, []);
 
   const startLocationTracking = async () => {
-    // Foreground 권한 요청
     const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
     if (foregroundStatus !== 'granted') {
       setLocationStatus('위치 권한이 거부되었습니다.');
       return;
     }
 
-    // Background 권한 요청
     const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
     if (backgroundStatus !== 'granted') {
       setLocationStatus('백그라운드 위치 권한이 거부되었습니다.');
