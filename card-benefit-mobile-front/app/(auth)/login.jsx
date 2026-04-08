@@ -17,7 +17,6 @@ export default function LoginScreen() {
   const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 24 },
-    
     input: { width: '100%', borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12 },
     error: { color: 'red', marginBottom: 8 },
     button: { width: '100%', backgroundColor: '#4A90E2', padding: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
@@ -35,7 +34,6 @@ export default function LoginScreen() {
       await AsyncStorage.setItem('userId', response.data.userId);
       await AsyncStorage.setItem('usrTpCd', response.data.usrTpCd);
 
-      // FCM 토큰 발급 및 서버 저장
       await registerFcmToken(response.data.token);
 
       router.replace('/(main)/home');
@@ -46,12 +44,22 @@ export default function LoginScreen() {
 
   const registerFcmToken = async (jwtToken) => {
     try {
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+        });
+      }
+
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') return;
 
-	const fcmToken = await Notifications.getExpoPushTokenAsync({
-	    projectId: '7d85980c-7ae1-435b-9a58-5f60c2435bd1'
-	});
+      const fcmToken = await Notifications.getExpoPushTokenAsync({
+        projectId: '7d85980c-7ae1-435b-9a58-5f60c2435bd1'
+      });
+
       await api.post('/api/users/fcm-token', { fcmToken: fcmToken.data }, {
         headers: { Authorization: `Bearer ${jwtToken}` }
       });

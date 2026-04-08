@@ -12,6 +12,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.cardbenefit.app",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -27,6 +29,14 @@
     },
     "plugins": [
       "expo-router",
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "위치 기반 혜택 알림을 위해 위치 접근이 필요합니다.",
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
       [
         "expo-splash-screen",
         {

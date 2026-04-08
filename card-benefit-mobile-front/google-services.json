@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "657498616116",
+    "project_id": "card-benefit",
+    "storage_bucket": "card-benefit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657498616116:android:72f205d3f41b27dda6f561",
+        "android_client_info": {
+          "package_name": "com.cardbenefit.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2nRlDIG43aR--p3Ivg4j2adK5rNSuYoY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

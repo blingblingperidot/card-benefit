@@ -3,7 +3,18 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import api from '../../api/axios';
+
+// 포그라운드 알림 핸들러
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export default function HomeScreen() {
 
@@ -51,19 +62,26 @@ export default function HomeScreen() {
   }, []);
 
   const startLocationTracking = async () => {
-    // 위치 권한 요청
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
+    // Foreground 권한 요청
+    const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+    if (foregroundStatus !== 'granted') {
       setLocationStatus('위치 권한이 거부되었습니다.');
       return;
     }
 
+    // Background 권한 요청
+    const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+    if (backgroundStatus !== 'granted') {
+      setLocationStatus('백그라운드 위치 권한이 거부되었습니다.');
+    }
+
     setLocationStatus('위치 추적 중...');
 
-    // 10초마다 위치 전송
     intervalRef.current = setInterval(async () => {
       try {
-        const location = await Location.getCurrentPositionAsync({});
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High
+        });
         const { latitude, longitude } = location.coords;
         await api.post('/api/locations/update', { latitude, longitude });
         setLocationStatus(`위치 전송 완료 (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
