@@ -14,7 +14,6 @@ public class FcmService {
 
     private static final String EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
 
-    // Expo Push 알림 발송
     public void sendNotification(String expoPushToken, String title, String body) {
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -29,9 +28,12 @@ public class FcmService {
             message.put("sound", "default");
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(message, headers);
-            restTemplate.postForObject(EXPO_PUSH_URL, entity, String.class);
 
+            // 응답 body 받아서 로그 출력
+            String response = restTemplate.postForObject(EXPO_PUSH_URL, entity, String.class);
             System.out.println("Expo Push 발송 성공: " + title + " → " + expoPushToken);
+            System.out.println("Expo Push API 응답: " + response);
+
         } catch (Exception e) {
             System.out.println("Expo Push 발송 실패: " + e.getMessage());
         }
