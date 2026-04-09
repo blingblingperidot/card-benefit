@@ -5,22 +5,63 @@
 <mapper namespace="com.cardbenefit.notification.mapper.NotificationMapper">
 
     <!-- FCM 토큰 조회 -->
-    <select id="findFcmToken" parameterType="String" resultType="map">
+    <select id="getFcmToken" parameterType="String" resultType="map">
         SELECT fcm_token
         FROM users
         WHERE user_id = #{userId}
     </select>
 
     <!-- 알림 이력 저장 -->
-    <insert id="insertNotificationLog" parameterType="map">
-        INSERT INTO notification_logs (log_id, user_id, benefit_id, status, created_at)
-        VALUES (
-            notification_logs_seq.NEXTVAL,
-            #{userId},
-            #{benefitId},
-            'SENT',
-            SYSTIMESTAMP
-        )
-    </insert>
+	<insert id="insertNotificationLog" parameterType="map">
+	    INSERT INTO notification_logs (
+	        log_id, user_id, benefit_id,
+	        expo_message_id, expo_status, error_message, created_at
+	    )
+	    VALUES (
+	        #{logId},
+	        #{userId},
+	        #{benefitId},
+	        #{expoMessageId,    jdbcType=VARCHAR},
+	        #{expoStatus,       jdbcType=VARCHAR},
+	        #{errorMessage,     jdbcType=VARCHAR},
+	        SYSTIMESTAMP
+	    )
+	</insert>
+
+    <!-- FCM 상태 업데이트 -->
+    <update id="updateFcmStatus" parameterType="map">
+        UPDATE notification_logs
+        SET fcm_status    = #{fcmStatus,    jdbcType=VARCHAR},
+            error_message = #{errorMessage, jdbcType=VARCHAR}
+        WHERE expo_message_id = #{expoMessageId}
+    </update>
+
+    <!-- 알림 목록 조회 -->
+	<select id="getNotificationList" parameterType="map" resultType="map">
+	    SELECT log_id,
+	           user_id,
+	           benefit_id,
+	           expo_message_id,
+	           expo_status,
+	           fcm_status,
+	           error_message,
+	           TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS') AS created_at
+	    FROM notification_logs
+	    <where>
+	        <if test="userId != null and userId != ''">
+	            user_id LIKE '%' || #{userId} || '%'
+	        </if>
+	    </where>
+	    ORDER BY created_at DESC
+	</select>
+ 
+	<!-- log_id MAX 조회 -->
+	<select id="getNextLogId" resultType="String">
+	    SELECT CASE
+	               WHEN MAX(log_id) IS NULL THEN 'NOTI0001'
+	               ELSE 'NOTI' || LPAD(TO_NUMBER(SUBSTR(MAX(log_id), 5)) + 1, 4, '0')
+	           END
+	    FROM notification_logs
+	</select>    
 
 </mapper>
