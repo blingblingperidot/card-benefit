@@ -8,6 +8,8 @@ import CardRegisterPage from './pages/CardRegisterPage';
 import BenefitListPage from './pages/BenefitListPage';
 import AdminPage from './pages/AdminPage';
 import BenefitRegisterPage from './pages/BenefitRegisterPage';
+import BenefitManagePage from './pages/BenefitManagePage';
+import NotificationLogPage from './pages/NotificationLogPage';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -22,8 +24,10 @@ function App() {
         <Route path="/card/register" element={token ? <CardRegisterPage /> : <Navigate to="/login" />} />
         <Route path="/benefit/list" element={token ? <BenefitListPage /> : <Navigate to="/login" />} />
         <Route path="/admin" element={token ? <AdminPage /> : <Navigate to="/login" />} />
-        <Route path="/" element={<Navigate to={token ? "/home" : "/login"} />} />
+        <Route path="/admin/benefit" element={token ? <BenefitManagePage /> : <Navigate to="/login" />} />
         <Route path="/admin/benefit/register" element={token ? <BenefitRegisterPage /> : <Navigate to="/login" />} />
+        <Route path="/admin/notification" element={token ? <NotificationLogPage /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to={token ? "/home" : "/login"} />} />
       </Routes>
     </BrowserRouter>
   );
