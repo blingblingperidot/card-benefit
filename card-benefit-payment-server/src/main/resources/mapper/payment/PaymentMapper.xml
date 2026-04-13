@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cardbenefit.payment.mapper.PaymentMapper">
+
+    <!-- payment_id 채번 -->
+    <select id="getNextPaymentId" resultType="String">
+        SELECT CASE
+            WHEN MAX(payment_id) IS NULL THEN 'PAY0001'
+            ELSE 'PAY' || LPAD(TO_NUMBER(SUBSTR(MAX(payment_id), 4)) + 1, 4, '0')
+        END
+        FROM payment_logs
+    </select>
+
+    <!-- 결제 이력 INSERT -->
+    <insert id="insertPaymentLog" parameterType="map">
+        INSERT INTO payment_logs (
+            payment_id, user_id, benefit_id, card_id,
+            partner_order_id, amount, discount_amount,
+            final_amount, status, created_at, updated_at
+        ) VALUES (
+            #{paymentId},
+            #{userId},
+            #{benefitId},
+            #{cardId},
+            #{partnerOrderId},
+            #{amount},
+            #{discountAmount,     jdbcType=NUMERIC},
+            #{finalAmount},
+            #{status,             jdbcType=VARCHAR},
+            SYSTIMESTAMP,
+            SYSTIMESTAMP
+        )
+    </insert>
+
+    <!-- 결제 상태 UPDATE -->
+    <update id="updatePaymentStatus" parameterType="map">
+        UPDATE payment_logs
+        SET status       = #{status,      jdbcType=VARCHAR},
+            tid          = #{tid,         jdbcType=VARCHAR},
+            error_message = #{errorMessage, jdbcType=VARCHAR},
+            updated_at   = SYSTIMESTAMP
+        WHERE partner_order_id = #{partnerOrderId}
+    </update>
+
+    <!-- 결제 내역 조회 -->
+    <select id="getPaymentList" parameterType="map" resultType="map">
+        SELECT payment_id,
+               user_id,
+               benefit_id,
+               card_id,
+               partner_order_id,
+               tid,
+               amount,
+               discount_amount,
+               final_amount,
+               status,
+               error_message,
+               TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS') AS created_at,
+               TO_CHAR(updated_at, 'YYYY-MM-DD HH24:MI:SS') AS updated_at
+        FROM payment_logs
+        <where>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- partner_order_id로 결제 조회 -->
+    <select id="getPaymentByOrderId" parameterType="String" resultType="map">
+        SELECT payment_id,
+               user_id,
+               benefit_id,
+               card_id,
+               partner_order_id,
+               tid,
+               amount,
+               discount_amount,
+               final_amount,
+               status,
+               error_message
+        FROM payment_logs
+        WHERE partner_order_id = #{partnerOrderId}
+    </select>
+
+</mapper>

@@ -14,4 +14,5 @@ public interface BenefitMapper {
     void deleteBenefit(Map<String, Object> map);
     
     List<Map<String, Object>> getAllBenefits();    
+    List<Map<String, Object>> getProducts(String storeName);
 }

@@ -18,9 +18,36 @@ public class BenefitService {
     @Autowired
     private JwtUtil jwtUtil;
 
- // 혜택 조회 (누구나 가능)
-    public List<Map<String, Object>> getCardBenefit(String cardType) {
+    // 토큰 검증 (로그인 사용자 체크)
+    private void checkToken(String token) {
+        String jwt = token.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(jwt)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+    }
+
+    // ADMIN 체크
+    private void checkAdmin(String token) {
+        String jwt = token.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(jwt)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+        String usrTpCd = jwtUtil.getUsrTpCdFromToken(jwt);
+        if (!"ADMIN".equals(usrTpCd)) {
+            throw new RuntimeException("관리자만 접근 가능합니다.");
+        }
+    }
+
+    // 혜택 조회 (로그인 사용자만 가능)
+    public List<Map<String, Object>> getCardBenefit(String token, String cardType) {
+        checkToken(token);
         return benefitMapper.getCardBenefit(cardType);
+    }
+
+    // 상품 목록 조회 (로그인 사용자만 가능)
+    public List<Map<String, Object>> getProducts(String token, String storeName) {
+        checkToken(token);
+        return benefitMapper.getProducts(storeName);
     }
 
     // 혜택 등록 (ADMIN만 가능)
@@ -41,19 +68,9 @@ public class BenefitService {
         return result;
     }
 
-    // ADMIN 체크
-    private void checkAdmin(String token) {
-        String jwt = token.replace("Bearer ", "");
-        if (!jwtUtil.validateToken(jwt)) {
-            throw new RuntimeException("유효하지 않은 토큰입니다.");
-        }
-        String usrTpCd = jwtUtil.getUsrTpCdFromToken(jwt);
-        if (!"ADMIN".equals(usrTpCd)) {
-            throw new RuntimeException("관리자만 접근 가능합니다.");
-        }
-    }
+    // 전체 혜택 목록 조회 (ADMIN만 가능)
     public List<Map<String, Object>> getAllBenefits(String token) {
         checkAdmin(token);
         return benefitMapper.getAllBenefits();
-    }    
+    }
 }
