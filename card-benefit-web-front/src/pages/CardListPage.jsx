@@ -43,8 +43,8 @@ function CardListPage() {
     }
   };
 
-  const handleBenefitList = (cardType, cardName) => {
-    navigate('/benefit/list', { state: { cardType, cardName } });
+  const handleBenefitList = (cardType, cardName, cardId) => {
+    navigate('/benefit/list', { state: { cardType, cardName, cardId } });
   };
 
   // ==============================================================
@@ -66,7 +66,7 @@ function CardListPage() {
           }}>
             <div
               style={{ cursor: 'pointer', flex: 1 }}
-              onClick={() => handleBenefitList(card.CARD_TYPE, card.CARD_NAME)}>
+              onClick={() => handleBenefitList(card.CARD_TYPE, card.CARD_NAME, card.CARD_ID)}>
               <p style={{ fontWeight: 'bold' }}>{card.CARD_NAME}</p>
               <p style={{ color: '#666' }}>{card.CARD_TYPE}</p>
             </div>

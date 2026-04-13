@@ -16,12 +16,16 @@ function BenefitManagePage() {
   const tdStyle = { padding: '12px', textAlign: 'left', fontSize: '13px' };
 
   const columns = [
-    { key: 'BENEFIT_ID', label: '혜택ID' },
-    { key: 'CARD_TYPE', label: '카드종류' },
-    { key: 'STORE_NAME', label: '매장명' },
-    { key: 'DESCRIPTION', label: '설명' },
-    { key: 'LATITUDE', label: '위도' },
-    { key: 'LONGITUDE', label: '경도' },
+    { key: 'BENEFIT_ID',     label: '혜택ID' },
+    { key: 'CARD_TYPE',      label: '카드종류' },
+    { key: 'STORE_NAME',     label: '매장명' },
+    { key: 'DESCRIPTION',    label: '설명' },
+    { key: 'LATITUDE',       label: '위도' },
+    { key: 'LONGITUDE',      label: '경도' },
+    { key: 'DISCOUNT_TYPE',  label: '할인유형' },
+    { key: 'DISCOUNT_RATE',  label: '할인율(%)' },
+    { key: 'DISCOUNT_PRICE', label: '할인금액(원)' },
+    { key: 'POINT_AMOUNT',   label: '적립포인트' },
   ];
 
   // ==============================================================
@@ -87,7 +91,7 @@ function BenefitManagePage() {
             benefits.map(benefit => (
               <tr key={benefit.BENEFIT_ID} style={{ borderBottom: '1px solid #eee' }}>
                 {columns.map(col => (
-                  <td key={col.key} style={tdStyle}>{benefit[col.key]}</td>
+                  <td key={col.key} style={tdStyle}>{benefit[col.key] ?? '-'}</td>
                 ))}
                 <td style={tdStyle}>
                   <button
@@ -101,23 +105,23 @@ function BenefitManagePage() {
           )}
         </tbody>
       </table>
-	  <div style={{ display: 'flex', marginTop: '16px' }}>
-	  <button
-	    onClick={() => navigate('/admin/benefit/register')}  // BenefitManagePage만
-	    style={{ margin: '8px', padding: '10px 24px', backgroundColor: '#4A90E2', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-	    혜택 등록
-	  </button>
-	  <button
-	    onClick={() => navigate('/admin')}
-	    style={{ margin: '8px', padding: '10px 24px', border: '1px solid #ccc', borderRadius: '8px', cursor: 'pointer' }}>
-	    뒤로
-	  </button>
-	  <button
-	    onClick={() => navigate('/home')}
-	    style={{ margin: '8px', padding: '10px 24px', backgroundColor: '#E24B4A', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-	    홈으로
-	  </button>
-	</div>
+      <div style={{ display: 'flex', marginTop: '16px' }}>
+        <button
+          onClick={() => navigate('/admin/benefit/register')}
+          style={{ margin: '8px', padding: '10px 24px', backgroundColor: '#4A90E2', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+          혜택 등록
+        </button>
+        <button
+          onClick={() => navigate('/admin')}
+          style={{ margin: '8px', padding: '10px 24px', border: '1px solid #ccc', borderRadius: '8px', cursor: 'pointer' }}>
+          뒤로
+        </button>
+        <button
+          onClick={() => navigate('/home')}
+          style={{ margin: '8px', padding: '10px 24px', backgroundColor: '#E24B4A', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+          홈으로
+        </button>
+      </div>
     </div>
   );
 }

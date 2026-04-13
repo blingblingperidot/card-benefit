@@ -10,6 +10,10 @@ import AdminPage from './pages/AdminPage';
 import BenefitRegisterPage from './pages/BenefitRegisterPage';
 import BenefitManagePage from './pages/BenefitManagePage';
 import NotificationLogPage from './pages/NotificationLogPage';
+import ProductListPage from './pages/ProductListPage';
+import PaymentPage from './pages/PaymentPage';
+import PaymentCompletePage from './pages/PaymentCompletePage';
+import PaymentHistoryPage from './pages/PaymentHistoryPage';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -27,6 +31,12 @@ function App() {
         <Route path="/admin/benefit" element={token ? <BenefitManagePage /> : <Navigate to="/login" />} />
         <Route path="/admin/benefit/register" element={token ? <BenefitRegisterPage /> : <Navigate to="/login" />} />
         <Route path="/admin/notification" element={token ? <NotificationLogPage /> : <Navigate to="/login" />} />
+        <Route path="/admin/payment" element={token ? <PaymentHistoryPage /> : <Navigate to="/login" />} />
+        <Route path="/product/list" element={token ? <ProductListPage /> : <Navigate to="/login" />} />
+        <Route path="/payment" element={token ? <PaymentPage /> : <Navigate to="/login" />} />
+        <Route path="/payment/success" element={token ? <PaymentCompletePage /> : <Navigate to="/login" />} />
+        <Route path="/payment/cancel" element={token ? <PaymentPage /> : <Navigate to="/login" />} />
+        <Route path="/payment/fail" element={token ? <PaymentPage /> : <Navigate to="/login" />} />
         <Route path="/" element={<Navigate to={token ? "/home" : "/login"} />} />
       </Routes>
     </BrowserRouter>

@@ -25,6 +25,11 @@ function AdminPage() {
         알림 이력
       </button>
       <button
+        onClick={() => navigate('/admin/payment')}
+        style={{ margin: '8px', padding: '10px 24px', backgroundColor: '#1D9E75', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '200px' }}>
+        결제 내역
+      </button>
+      <button
         onClick={() => navigate('/home')}
         style={{ margin: '8px', padding: '10px 24px', backgroundColor: '#E24B4A', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '200px' }}>
         홈으로
