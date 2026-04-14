@@ -25,6 +25,8 @@ public class LocationEventConsumer {
             String userId    = (String) event.get("userId");
             String benefitId = (String) event.get("benefitId");
             String storeName = (String) event.get("storeName");
+            String cardId    = (String) event.get("cardId");
+            String cardType  = (String) event.get("cardType");
 
             String fcmToken = notificationService.getFcmToken(userId);
             if (fcmToken == null) {
@@ -32,8 +34,7 @@ public class LocationEventConsumer {
                 return;
             }
 
-            // 발송 + DB 저장 한번에
-            notificationService.saveNotificationLog(userId, benefitId, storeName);
+            notificationService.saveNotificationLog(userId, benefitId, storeName, cardId, cardType);
 
         } catch (Exception e) {
             System.out.println("location-event 처리 실패: " + e.getMessage());

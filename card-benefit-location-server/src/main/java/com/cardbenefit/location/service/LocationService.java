@@ -6,7 +6,6 @@ import com.cardbenefit.location.config.RedisUtil;
 import com.cardbenefit.location.mapper.LocationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +15,10 @@ public class LocationService {
 
     @Autowired
     private LocationMapper locationMapper;
-
     @Autowired
     private LocationProducer locationProducer;
-
     @Autowired
     private JwtUtil jwtUtil;
-
     @Autowired
     private RedisUtil redisUtil;
 
@@ -33,7 +29,6 @@ public class LocationService {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
         String userId = jwtUtil.getUserIdFromToken(jwt);
-
         double userLat = Double.parseDouble(map.get("latitude").toString());
         double userLon = Double.parseDouble(map.get("longitude").toString());
 
@@ -48,18 +43,30 @@ public class LocationService {
 
             if (distance <= 200) {
                 String benefitId = benefit.get("BENEFIT_ID").toString();
+                String cardType  = benefit.get("CARD_TYPE").toString();
 
                 // 중복 체크 - 이미 알림 발송했으면 스킵
                 if (redisUtil.isAlreadyNotified(userId, benefitId)) {
                     continue;
                 }
 
+                // userId + cardType으로 cardId 조회
+                String cardId = locationMapper.getCardIdByUserAndCardType(userId, cardType);
+
+                // 해당 카드가 없으면 스킵
+                if (cardId == null || cardId.isEmpty()) {
+                    continue;
+                }
+
                 String message = "{"
-                        + "\"userId\":\"" + userId + "\","
-                        + "\"benefitId\":\"" + benefitId + "\","
-                        + "\"storeName\":\"" + benefit.get("STORE_NAME") + "\","
-                        + "\"distance\":" + distance
+                        + "\"userId\":\""    + userId                      + "\","
+                        + "\"benefitId\":\"" + benefitId                   + "\","
+                        + "\"storeName\":\"" + benefit.get("STORE_NAME")   + "\","
+                        + "\"cardId\":\""    + cardId                      + "\","
+                        + "\"cardType\":\""  + cardType                    + "\","
+                        + "\"distance\":"    + distance
                         + "}";
+
                 locationProducer.sendLocationEvent(message);
 
                 // 알림 발송 기록 저장

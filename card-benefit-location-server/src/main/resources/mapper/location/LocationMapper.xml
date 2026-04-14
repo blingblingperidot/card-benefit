@@ -9,5 +9,13 @@
         SELECT benefit_id, card_type, store_name, latitude, longitude, description
         FROM benefits
     </select>
+    
+    <select id="getCardIdByUserAndCardType" resultType="String">
+    SELECT card_id
+    FROM cards
+    WHERE user_id  = #{userId}
+    AND card_type = #{cardType}
+    AND ROWNUM = 1
+    </select>
 
 </mapper>
