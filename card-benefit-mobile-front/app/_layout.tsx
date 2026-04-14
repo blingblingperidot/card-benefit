@@ -14,6 +14,12 @@ export default function RootLayout() {
         <Stack.Screen name="(main)/benefitlist" options={{ headerShown: false }} />
         <Stack.Screen name="(main)/adminpage" options={{ headerShown: false }} />
         <Stack.Screen name="(main)/benefitregister" options={{ headerShown: false }} />
+        <Stack.Screen name="(main)/benefitmanage" options={{ headerShown: false }} />
+        <Stack.Screen name="(main)/notificationlog" options={{ headerShown: false }} />
+        <Stack.Screen name="(main)/productlist" options={{ headerShown: false }} />
+        <Stack.Screen name="(main)/payment" options={{ headerShown: false }} />
+        <Stack.Screen name="(main)/paymentcomplete" options={{ headerShown: false }} />
+        <Stack.Screen name="(main)/paymenthistory" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </>

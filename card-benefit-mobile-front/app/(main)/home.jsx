@@ -59,8 +59,23 @@ export default function HomeScreen() {
       console.log('알림 수신:', notification);
     });
 
+    // 알림 클릭 리스너
     const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
       console.log('알림 클릭:', response);
+      const data = response.notification.request.content.data;
+
+      if (data?.storeName) {
+        router.push({
+          pathname: '/(main)/productlist',
+          params: {
+            storeName: data.storeName,
+            benefit:   JSON.stringify({}),
+            cardId:    data.cardId   || '',
+            cardType:  data.cardType || '',
+            cardName:  '',
+          }
+        });
+      }
     });
 
     return () => {

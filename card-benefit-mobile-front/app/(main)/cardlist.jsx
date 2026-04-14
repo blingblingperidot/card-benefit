@@ -62,8 +62,8 @@ export default function CardListScreen() {
     }
   };
 
-  const handleBenefitList = (cardType, cardName) => {
-    router.push({ pathname: '/(main)/benefitlist', params: { cardType, cardName } });
+  const handleBenefitList = (cardType, cardName, cardId) => {
+    router.push({ pathname: '/(main)/benefitlist', params: { cardType, cardName, cardId } });
   };
 
   // ==============================================================
@@ -85,7 +85,7 @@ export default function CardListScreen() {
             <View style={styles.card}>
               <TouchableOpacity
                 style={styles.cardInfo}
-                onPress={() => handleBenefitList(item.CARD_TYPE, item.CARD_NAME)}>
+                onPress={() => handleBenefitList(item.CARD_TYPE, item.CARD_NAME, item.CARD_ID)}>
                 <Text style={styles.cardName}>{item.CARD_NAME}</Text>
                 <Text style={styles.cardType}>{item.CARD_TYPE}</Text>
               </TouchableOpacity>

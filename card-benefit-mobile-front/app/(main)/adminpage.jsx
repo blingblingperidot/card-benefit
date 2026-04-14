@@ -11,11 +11,13 @@ export default function AdminPageScreen() {
   const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
-    subtitle: { fontSize: 16, color: '#666', marginBottom: 24 },
+    subtitle: { fontSize: 14, color: '#666', marginBottom: 32 },
     button: { width: '100%', backgroundColor: '#4A90E2', padding: 14, borderRadius: 8, alignItems: 'center', marginBottom: 8 },
     buttonText: { color: '#fff', fontWeight: 'bold' },
-    purpleButton: { width: '100%', backgroundColor: '#9B59B6', padding: 14, borderRadius: 8, alignItems: 'center', marginBottom: 8 },
-    homeButton: { width: '100%', backgroundColor: '#E24B4A', padding: 14, borderRadius: 8, alignItems: 'center', marginBottom: 8 },
+    notificationButton: { width: '100%', backgroundColor: '#9B59B6', padding: 14, borderRadius: 8, alignItems: 'center', marginBottom: 8 },
+    paymentButton: { width: '100%', backgroundColor: '#1D9E75', padding: 14, borderRadius: 8, alignItems: 'center', marginBottom: 8 },
+    homeButton: { width: '100%', backgroundColor: '#E24B4A', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 8 },
+    buttonText2: { color: '#fff', fontWeight: 'bold' },
   });
 
   // ==============================================================
@@ -31,14 +33,19 @@ export default function AdminPageScreen() {
         <Text style={styles.buttonText}>혜택 관리</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.purpleButton}
+        style={styles.notificationButton}
         onPress={() => router.push('/(main)/notificationlog')}>
         <Text style={styles.buttonText}>알림 이력</Text>
       </TouchableOpacity>
       <TouchableOpacity
+        style={styles.paymentButton}
+        onPress={() => router.push('/(main)/paymenthistory')}>
+        <Text style={styles.buttonText}>결제 내역</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.homeButton}
         onPress={() => router.replace('/(main)/home')}>
-        <Text style={styles.buttonText}>홈으로</Text>
+        <Text style={styles.buttonText2}>홈으로</Text>
       </TouchableOpacity>
     </View>
   );

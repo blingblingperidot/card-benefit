@@ -9,7 +9,7 @@ export default function BenefitListScreen() {
   //                        변수 정의
   // ==============================================================
   const router = useRouter();
-  const { cardType, cardName } = useLocalSearchParams();
+  const { cardType, cardName, cardId } = useLocalSearchParams();
   const [benefits, setBenefits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,6 +23,9 @@ export default function BenefitListScreen() {
     card: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 16, marginBottom: 12 },
     storeName: { fontWeight: 'bold', fontSize: 16 },
     description: { color: '#666', marginTop: 4 },
+    discount: { color: '#4A90E2', fontWeight: 'bold', marginTop: 4 },
+    productButton: { backgroundColor: '#4A90E2', padding: 10, borderRadius: 6, alignItems: 'center', marginTop: 8 },
+    productButtonText: { color: '#fff', fontWeight: 'bold' },
     homeButton: { padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 8 },
     homeButtonText: { color: '#4A90E2' }
   });
@@ -47,6 +50,16 @@ export default function BenefitListScreen() {
   };
 
   // ==============================================================
+  //                        할인 정보 표시
+  // ==============================================================
+  const getDiscountText = (item) => {
+    if (item.DISCOUNT_TYPE === 'RATE')   return `${item.DISCOUNT_RATE}% 할인`;
+    if (item.DISCOUNT_TYPE === 'AMOUNT') return `${item.DISCOUNT_PRICE}원 할인`;
+    if (item.DISCOUNT_TYPE === 'POINT')  return `${item.POINT_AMOUNT}P 적립`;
+    return null;
+  };
+
+  // ==============================================================
   //                          화면 구성
   // ==============================================================
   return (
@@ -65,6 +78,23 @@ export default function BenefitListScreen() {
             <View style={styles.card}>
               <Text style={styles.storeName}>{item.STORE_NAME}</Text>
               <Text style={styles.description}>{item.DESCRIPTION}</Text>
+              {getDiscountText(item) && (
+                <Text style={styles.discount}>{getDiscountText(item)}</Text>
+              )}
+              <TouchableOpacity
+                style={styles.productButton}
+                onPress={() => router.push({
+                  pathname: '/(main)/productlist',
+                  params: {
+                    storeName:     item.STORE_NAME,
+                    benefit:       JSON.stringify(item),
+                    cardId:        cardId,
+                    cardType:      cardType,
+                    cardName:      cardName,
+                  }
+                })}>
+                <Text style={styles.productButtonText}>상품 보기</Text>
+              </TouchableOpacity>
             </View>
           )}
         />
