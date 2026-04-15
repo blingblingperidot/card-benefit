@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-
+//card jwt
 @Component
 public class JwtUtil {
 
