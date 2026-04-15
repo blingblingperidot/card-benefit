@@ -8,7 +8,7 @@ import api from '../../api/axios';
 export default function LoginScreen() {
 
   // ==============================================================
-  //                        변수 정의
+  //                        변수 정의s
   // ==============================================================
   const router = useRouter();
   const [form, setForm] = useState({ userId: '', password: '' });
