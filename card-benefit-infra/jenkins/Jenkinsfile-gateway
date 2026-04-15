@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+
+    environment {
+        SERVICE_DIR  = 'card-benefit-gateway-server'
+        JAR_NAME     = 'card-benefit-gateway-server-0.0.1-SNAPSHOT.jar'
+        JAR_PATH     = "${SERVICE_DIR}/target/${JAR_NAME}"
+        BACKUP_DIR   = 'C:/card-benefit-backup'
+        BACKUP_PATH  = "${BACKUP_DIR}/gateway-server.jar"
+        PORT         = '8080'
+        LOG_PATH     = "${BACKUP_DIR}/logs/gateway-server.log"
+    }
+
+    stages {
+        stage('Check Changes') {
+            steps {
+                script {
+                    def changes = bat(
+                        script: "@git diff --name-only HEAD~1 HEAD | findstr ${SERVICE_DIR}",
+                        returnStdout: true
+                    ).trim()
+                    if (changes.isEmpty()) {
+                        currentBuild.result = 'NOT_BUILT'
+                        error("${SERVICE_DIR} 변경사항 없음 - 빌드 스킵")
+                    }
+                    echo "변경사항 감지: ${changes}"
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                dir("${SERVICE_DIR}") {
+                    bat 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    bat "if not exist ${BACKUP_DIR} mkdir ${BACKUP_DIR}"
+                    bat "if not exist ${BACKUP_DIR}\\logs mkdir ${BACKUP_DIR}\\logs"
+                    bat "copy /Y ${JAR_PATH} ${BACKUP_PATH} || echo 백업 파일 없음"
+                    bat """
+                        for /f "tokens=5" %%a in ('netstat -aon ^| findstr :${PORT} ^| findstr LISTENING') do taskkill /F /PID %%a
+                    """
+                    sleep(3)
+                    bat "start /B java -jar ${JAR_PATH} > ${LOG_PATH} 2>&1"
+                    echo "배포 완료!"
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            script {
+                echo "빌드 실패 - 이전 버전으로 롤백"
+                bat """
+                    for /f "tokens=5" %%a in ('netstat -aon ^| findstr :${PORT} ^| findstr LISTENING') do taskkill /F /PID %%a
+                """
+                sleep(3)
+                bat "start /B java -jar ${BACKUP_PATH} > ${LOG_PATH} 2>&1"
+            }
+            slackSend(
+                channel: '#jenkins-build',
+                color: 'danger',
+                message: "❌ [${env.SERVICE_DIR}] 빌드 실패 & 롤백\n브랜치: ${env.GIT_BRANCH}\n빌드: ${env.BUILD_NUMBER}\n${env.BUILD_URL}"
+            )
+        }
+        success {
+            slackSend(
+                channel: '#jenkins-build',
+                color: 'good',
+                message: "✅ [${env.SERVICE_DIR}] 빌드 & 배포 성공\n브랜치: ${env.GIT_BRANCH}\n빌드: ${env.BUILD_NUMBER}\n${env.BUILD_URL}"
+            )
+        }
+        aborted {
+            slackSend(
+                channel: '#jenkins-build',
+                color: 'warning',
+                message: "⏭️ [${env.SERVICE_DIR}] 변경사항 없음 - 빌드 스킵\n브랜치: ${env.GIT_BRANCH}"
+            )
+        }
+    }
+}

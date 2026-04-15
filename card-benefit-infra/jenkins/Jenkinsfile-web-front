@@ -1,0 +1,87 @@
+pipeline {
+    agent any
+
+    environment {
+        SERVICE_DIR  = 'card-benefit-web-front'
+        BACKUP_DIR   = 'C:/card-benefit-backup'
+        BACKUP_PATH  = "${BACKUP_DIR}/web-front"
+        LOG_PATH     = "${BACKUP_DIR}/logs/web-front.log"
+    }
+
+    stages {
+        stage('Check Changes') {
+            steps {
+                script {
+                    def changes = bat(
+                        script: "@git diff --name-only HEAD~1 HEAD | findstr ${SERVICE_DIR}",
+                        returnStdout: true
+                    ).trim()
+                    if (changes.isEmpty()) {
+                        currentBuild.result = 'NOT_BUILT'
+                        error("${SERVICE_DIR} 변경사항 없음 - 빌드 스킵")
+                    }
+                    echo "변경사항 감지: ${changes}"
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install') {
+            steps {
+                dir("${SERVICE_DIR}") {
+                    bat 'npm install'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir("${SERVICE_DIR}") {
+                    bat 'npm run build'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    bat "if not exist ${BACKUP_DIR} mkdir ${BACKUP_DIR}"
+                    bat "if not exist ${BACKUP_DIR}\\logs mkdir ${BACKUP_DIR}\\logs"
+                    // 기존 build 백업
+                    bat "if exist ${BACKUP_PATH} rmdir /S /Q ${BACKUP_PATH}"
+                    bat "xcopy /E /I ${SERVICE_DIR}\\build ${BACKUP_PATH}"
+                    echo "웹 프론트 배포 완료!"
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            slackSend(
+                channel: '#jenkins-build',
+                color: 'danger',
+                message: "❌ [${env.SERVICE_DIR}] 빌드 실패\n브랜치: ${env.GIT_BRANCH}\n빌드: ${env.BUILD_NUMBER}\n${env.BUILD_URL}"
+            )
+        }
+        success {
+            slackSend(
+                channel: '#jenkins-build',
+                color: 'good',
+                message: "✅ [${env.SERVICE_DIR}] 빌드 & 배포 성공\n브랜치: ${env.GIT_BRANCH}\n빌드: ${env.BUILD_NUMBER}\n${env.BUILD_URL}"
+            )
+        }
+        aborted {
+            slackSend(
+                channel: '#jenkins-build',
+                color: 'warning',
+                message: "⏭️ [${env.SERVICE_DIR}] 변경사항 없음 - 빌드 스킵\n브랜치: ${env.GIT_BRANCH}"
+            )
+        }
+    }
+}
