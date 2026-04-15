@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SERVICE_DIR  = 'card-benefit-web-front'
-        BACKUP_DIR   = 'C:/card-benefit-backup'
+        BACKUP_DIR   = '/var/jenkins_home/backup'
         BACKUP_PATH  = "${BACKUP_DIR}/web-front"
         LOG_PATH     = "${BACKUP_DIR}/logs/web-front.log"
     }
@@ -12,8 +12,8 @@ pipeline {
         stage('Check Changes') {
             steps {
                 script {
-                    def changes = bat(
-                        script: "@git diff --name-only HEAD~1 HEAD | findstr ${SERVICE_DIR}",
+                    def changes = sh(
+                        script: "git diff --name-only HEAD~1 HEAD | grep ${SERVICE_DIR} || true",
                         returnStdout: true
                     ).trim()
                     if (changes.isEmpty()) {
@@ -34,7 +34,7 @@ pipeline {
         stage('Install') {
             steps {
                 dir("${SERVICE_DIR}") {
-                    bat 'npm install'
+                    sh 'npm install'
                 }
             }
         }
@@ -42,7 +42,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir("${SERVICE_DIR}") {
-                    bat 'npm run build'
+                    sh 'npm run build'
                 }
             }
         }
@@ -50,11 +50,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    bat "if not exist ${BACKUP_DIR} mkdir ${BACKUP_DIR}"
-                    bat "if not exist ${BACKUP_DIR}\\logs mkdir ${BACKUP_DIR}\\logs"
-                    // 기존 build 백업
-                    bat "if exist ${BACKUP_PATH} rmdir /S /Q ${BACKUP_PATH}"
-                    bat "xcopy /E /I ${SERVICE_DIR}\\build ${BACKUP_PATH}"
+                    sh "mkdir -p ${BACKUP_DIR}/logs"
+                    sh "rm -rf ${BACKUP_PATH} || true"
+                    sh "cp -r ${SERVICE_DIR}/build ${BACKUP_PATH}"
                     echo "웹 프론트 배포 완료!"
                 }
             }

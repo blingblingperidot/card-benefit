@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SERVICE_DIR  = 'card-benefit-mobile-front'
-        BACKUP_DIR   = 'C:/card-benefit-backup'
+        BACKUP_DIR   = '/var/jenkins_home/backup'
         LOG_PATH     = "${BACKUP_DIR}/logs/mobile-front.log"
     }
 
@@ -11,8 +11,8 @@ pipeline {
         stage('Check Changes') {
             steps {
                 script {
-                    def changes = bat(
-                        script: "@git diff --name-only HEAD~1 HEAD | findstr ${SERVICE_DIR}",
+                    def changes = sh(
+                        script: "git diff --name-only HEAD~1 HEAD | grep ${SERVICE_DIR} || true",
                         returnStdout: true
                     ).trim()
                     if (changes.isEmpty()) {
@@ -33,7 +33,7 @@ pipeline {
         stage('Install') {
             steps {
                 dir("${SERVICE_DIR}") {
-                    bat 'npm install'
+                    sh 'npm install'
                 }
             }
         }
@@ -41,7 +41,7 @@ pipeline {
         stage('EAS Build') {
             steps {
                 dir("${SERVICE_DIR}") {
-                    bat 'npx eas build -p android --profile development --non-interactive'
+                    sh 'npx eas build -p android --profile development --non-interactive'
                 }
             }
         }

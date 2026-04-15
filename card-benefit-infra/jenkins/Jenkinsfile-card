@@ -5,7 +5,7 @@ pipeline {
         SERVICE_DIR  = 'card-benefit-card-server'
         JAR_NAME     = 'card-benefit-card-server-0.0.1-SNAPSHOT.jar'
         JAR_PATH     = "${SERVICE_DIR}/target/${JAR_NAME}"
-        BACKUP_DIR   = 'C:/card-benefit-backup'
+        BACKUP_DIR   = '/var/jenkins_home/backup'
         BACKUP_PATH  = "${BACKUP_DIR}/card-server.jar"
         PORT         = '8082'
         LOG_PATH     = "${BACKUP_DIR}/logs/card-server.log"
@@ -15,8 +15,8 @@ pipeline {
         stage('Check Changes') {
             steps {
                 script {
-                    def changes = bat(
-                        script: "@git diff --name-only HEAD~1 HEAD | findstr ${SERVICE_DIR}",
+                    def changes = sh(
+                        script: "git diff --name-only HEAD~1 HEAD | grep ${SERVICE_DIR} || true",
                         returnStdout: true
                     ).trim()
                     if (changes.isEmpty()) {
@@ -37,7 +37,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 dir("${SERVICE_DIR}") {
-                    bat 'mvn clean package'
+                    sh 'mvn clean package'
                 }
             }
         }
@@ -45,14 +45,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    bat "if not exist ${BACKUP_DIR} mkdir ${BACKUP_DIR}"
-                    bat "if not exist ${BACKUP_DIR}\\logs mkdir ${BACKUP_DIR}\\logs"
-                    bat "copy /Y ${JAR_PATH} ${BACKUP_PATH} || echo 백업 파일 없음"
-                    bat """
-                        for /f "tokens=5" %%a in ('netstat -aon ^| findstr :${PORT} ^| findstr LISTENING') do taskkill /F /PID %%a
+                    sh "mkdir -p ${BACKUP_DIR}/logs"
+                    sh "cp -f ${JAR_PATH} ${BACKUP_PATH} || true"
+                    sh """
+                        PID=\$(lsof -ti:${PORT}) || true
+                        if [ ! -z "\$PID" ]; then kill -9 \$PID; fi
                     """
                     sleep(3)
-                    bat "start /B java -jar ${JAR_PATH} > ${LOG_PATH} 2>&1"
+                    sh "nohup java -jar ${JAR_PATH} > ${LOG_PATH} 2>&1 &"
                     echo "배포 완료!"
                 }
             }
@@ -63,11 +63,12 @@ pipeline {
         failure {
             script {
                 echo "빌드 실패 - 이전 버전으로 롤백"
-                bat """
-                    for /f "tokens=5" %%a in ('netstat -aon ^| findstr :${PORT} ^| findstr LISTENING') do taskkill /F /PID %%a
+                sh """
+                    PID=\$(lsof -ti:${PORT}) || true
+                    if [ ! -z "\$PID" ]; then kill -9 \$PID; fi
                 """
                 sleep(3)
-                bat "start /B java -jar ${BACKUP_PATH} > ${LOG_PATH} 2>&1"
+                sh "nohup java -jar ${BACKUP_PATH} > ${LOG_PATH} 2>&1 &"
             }
             slackSend(
                 channel: '#jenkins-build',
