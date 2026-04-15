@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 function AdminPage() {
 
   // ==============================================================
-  //                        변수 정의s
+  //                        변수 정의
   // ==============================================================
   const navigate = useNavigate();
 
