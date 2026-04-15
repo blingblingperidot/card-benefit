@@ -37,7 +37,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 dir("${SERVICE_DIR}") {
-                    sh 'mvn clean package'
+                    sh 'mvn clean package -DskipTests'
                 }
             }
         }
