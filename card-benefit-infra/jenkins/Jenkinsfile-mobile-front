@@ -33,15 +33,7 @@ pipeline {
         stage('Install') {
             steps {
                 dir("${SERVICE_DIR}") {
-                    sh 'npm install'
-                }
-            }
-        }
-
-        stage('EAS Build') {
-            steps {
-                dir("${SERVICE_DIR}") {
-                    sh 'npx eas build -p android --profile development --non-interactive'
+                    sh 'npm install --legacy-peer-deps'
                 }
             }
         }
@@ -59,7 +51,7 @@ pipeline {
             slackSend(
                 channel: '#jenkins-build',
                 color: 'good',
-                message: "✅ [${env.SERVICE_DIR}] EAS 빌드 성공\n브랜치: ${env.GIT_BRANCH}\n빌드: ${env.BUILD_NUMBER}\n${env.BUILD_URL}"
+                message: "✅ [${env.SERVICE_DIR}] npm install 성공 (EAS Build는 수동)\n브랜치: ${env.GIT_BRANCH}\n빌드: ${env.BUILD_NUMBER}\n${env.BUILD_URL}"
             )
         }
         aborted {
