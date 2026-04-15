@@ -8,7 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
-//notification 
+//notifications 
 @Configuration
 public class FirebaseConfig {
 
